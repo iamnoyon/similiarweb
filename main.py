@@ -77,37 +77,70 @@ cc = {4:{"name":"Afghanistan","code":"AF"},8:{"name":"Albania","code":"AL"},10:{
 
 #base_url = 'https://www.similarweb.com/website/'
 base_url = 'https://data.similarweb.com/api/v1/data?domain='
-url = base_url + domain
+if domain:
+    url = base_url + domain
+else:
+    print('Domain Not Found')
 #html = requests.get(url, cookies=cookies, headers=headers)
-jsonresponse = requests.get(url, cookies=cookies, headers=headers)
+if url:
+    jsonresponse = requests.get(url, cookies=cookies, headers=headers)
+else:
+    print('Check URL')
 content = json.loads(jsonresponse.content)
-print(content)
-SiteName = content['SiteName']
-#Description = (content['Description'])
-GlobalRank = (content['GlobalRank']['Rank'])
-CC4CCrank = content['CountryRank']['Country'] #CC == country code
-CN4CCrank = cc[CC4CCrank]["name"] #CN == country name
-CountryRank = content['CountryRank']['Rank']
-SiteCategory = content['CategoryRank']['Category']
-CategoryRank = content['CategoryRank']['Rank']
-BounceRate = round(float(content['Engagments']['BounceRate']) * 100, 2)
-PagePerVisit = round(float(content['Engagments']['PagePerVisit']), 2)
-MonthlyVisits = numerize.numerize(round(float(content['Engagments']['Visits'])))
-TimesInSec = round(float(content['Engagments']['TimeOnSite']))
-TimeOnSite = datetime.timedelta(seconds=TimesInSec)
-TCSlist = content['TopCountryShares']
-TopCountryShares = []
-for dict in TCSlist:
-    tCountryName = cc[dict['Country']]['name']
-    tShareValue = round(float(dict['Value'])*100,2)
-    tCountryShare = str(tCountryName)+ " : " + str(tShareValue)+ "%"
-    TopCountryShares.append(tCountryShare)
-TraSou = content['TrafficSources']
-TrafficSources = []
-for key in TraSou:
-    #print(key)
-    tTraSouValue = round(float(TraSou[key])*100,2)
-    tTrafficSource = str(key)+ " : " + str(tTraSouValue) + "%"
-    TrafficSources.append(tTrafficSource)
+#print(content)
+if content:
+    SiteName = content['SiteName']
+    if 'Title' in content:
+        Title = content['Title']
+    else:
+        Title = ''
+    if 'Description' in content:
+        Description = (content['Description'])
+    else:
+        Description = ''
+    GlobalRank = (content['GlobalRank']['Rank'])
+    CC4CCrank = content['CountryRank']['Country'] #CC == country code
+    RankedCountryName = cc[CC4CCrank]["name"] #CN == country name
+    CountryRank = content['CountryRank']['Rank']
+    SiteCategory = content['CategoryRank']['Category']
+    CategoryRank = content['CategoryRank']['Rank']
+    BounceRate = round(float(content['Engagments']['BounceRate']) * 100, 2)
+    PagePerVisit = round(float(content['Engagments']['PagePerVisit']), 2)
+    MonthlyVisits = numerize.numerize(round(float(content['Engagments']['Visits'])))
+    TimesInSec = round(float(content['Engagments']['TimeOnSite']))
+    TimeOnSite = datetime.timedelta(seconds=TimesInSec)
+    TCSlist = content['TopCountryShares']
+    TopCountryShares = []
+    for dict in TCSlist:
+        tCountryName = cc[dict['Country']]['name']
+        tShareValue = round(float(dict['Value'])*100,2)
+        tCountryShare = str(tCountryName)+ " : " + str(tShareValue)+ "%"
+        TopCountryShares.append(tCountryShare)
+    TraSou = content['TrafficSources']
+    TrafficSources = []
+    for key in TraSou:
+        #print(key)
+        tTraSouValue = round(float(TraSou[key])*100,2)
+        tTrafficSource = str(key)+ " : " + str(tTraSouValue) + "%"
+        TrafficSources.append(tTrafficSource)
+    
+    print("--------------------\n",SiteName,"\n--------------------\n")
+    print(Title, Description,"\n")
+    print("Global Rank : ", GlobalRank)
+    #print("Ranked Country Name : ", RankedCountryName)
+    print("Country Rank : ", CountryRank,"(",RankedCountryName,")")
+    print("Site Category : ", SiteCategory)
+    print("Category Rank : ", CategoryRank)
+    print("Bounce Rate : ", BounceRate)
+    print("Page Per Visit : ", PagePerVisit)
+    print("Monthly Visits : ", MonthlyVisits)
+    print("Time On Site : ", TimeOnSite)
+    print('\nTop Country Shares\n----------------------')
+    for TopCountryShare in TopCountryShares:
+        print(TopCountryShare)
+    print('\nTraffic Sources\n--------------------------',)
+    for TrafficSource in TrafficSources:
+        print(TrafficSource)
 
-print(TopCountryShares)
+else:
+    print('No content found')
